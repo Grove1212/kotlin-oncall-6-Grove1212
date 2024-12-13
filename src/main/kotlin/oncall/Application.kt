@@ -1,5 +1,10 @@
 package oncall
 
+import oncall.controller.GetInput
+import oncall.view.InputView
+
 fun main() {
-    TODO("프로그램 구현")
+    val inputView = InputView()
+    val getInput = GetInput(inputView)
+    getInput.run()
 }
