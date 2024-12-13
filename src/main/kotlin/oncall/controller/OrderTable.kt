@@ -29,6 +29,7 @@ class OrderTable(
         putHoliday(shiftTable)
         putOrder(shiftTable)
         updateOrderIfWorkTwoDays(shiftTable)
+        outputView.printOrderTable(shiftTable.toList())
     }
 
     private fun updateOrderIfWorkTwoDays(shiftTable: MutableList<WorkCell>) {
@@ -55,10 +56,11 @@ class OrderTable(
     private fun makeShiftTable(): MutableList<WorkCell> {
         val shiftTable = mutableListOf<WorkCell>()
         val lastDateOfMonth = getLastDateOfMonth(month)
-        val weekDay = getStartWeekDay(startWeekDay)
+        var weekDay = getStartWeekDay(startWeekDay)
 
         for (i in 1..lastDateOfMonth) {
-            shiftTable.add(WorkCell(month, i, weekDay?.plus(1)))
+            shiftTable.add(WorkCell(month, i, weekDay))
+            weekDay = weekDay?.plus(1)
         }
         return shiftTable
     }
@@ -86,8 +88,8 @@ class OrderTable(
 
     private fun getStartWeekDay(startWeekDay: String): DayOfWeek? = when (startWeekDay) {
         "월" -> DayOfWeek.MONDAY
-        "화" -> DayOfWeek.SATURDAY
-        "수" -> DayOfWeek.TUESDAY
+        "화" -> DayOfWeek.TUESDAY
+        "수" -> DayOfWeek.WEDNESDAY
         "목" -> DayOfWeek.THURSDAY
         "금" -> DayOfWeek.FRIDAY
         "토" -> DayOfWeek.SATURDAY
