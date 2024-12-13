@@ -1,6 +1,7 @@
 package oncall.controller
 
-import oncall.model.Cell
+import oncall.model.CalendarCell
+import oncall.model.WorkCell
 import oncall.view.OutputView
 import java.time.DayOfWeek
 
@@ -12,32 +13,47 @@ class OrderTable(
         val (month, startWeekDay) = inputController.controlGetMonthAndStartDayOfWeek()
         val weekdayOrder = inputController.controlGetWeekdayOrder()
         val holidayOrder = inputController.controlGetHolidayOrder()
+        val holidays = inputController.controlGetHolidays()
 
         val shiftTable = makeShiftTable(month, startWeekDay)
-        putWeekdayOrder(shiftTable)
-        putHolidayOrder(shiftTable)
+        putHoliday(shiftTable, holidays)
+        putOrder(shiftTable, weekdayOrder, holidayOrder)
     }
 
-    private fun makeShiftTable(month: Int, startWeekDayOfString: String): MutableList<Cell> {
-        val shiftTable = mutableListOf<Cell>()
+    private fun makeShiftTable(month: Int, startWeekDayOfString: String): MutableList<WorkCell> {
+        val shiftTable = mutableListOf<WorkCell>()
         val lastDateOfMonth = getLastDateOfMonth(month)
         val weekDay = getStartWeekDay(startWeekDayOfString)
 
         for (i in 1..lastDateOfMonth) {
-            shiftTable.add(Cell(month, i, weekDay?.plus(1)))
+            shiftTable.add(WorkCell(month, i, weekDay?.plus(1)))
         }
         return shiftTable
     }
 
-    private fun putHolidayOrder(shiftTable: MutableList<Cell>) {
-        TODO("Not yet implemented")
+    private fun putHoliday(shiftTable: MutableList<WorkCell>, holidays: List<CalendarCell>) {
+        holidays.filter { shiftTable[0].month == it.month }
+            .forEach { holiday ->
+                shiftTable.find { it.date == holiday.date }?.isHoliday = true
+            }
     }
 
-    private fun putWeekdayOrder(shiftTable: MutableList<Cell>) {
-        TODO("Not yet implemented")
+    private fun putOrder(shiftTable: MutableList<WorkCell>, weekdayOrder: List<String>, holidayOrder: List<String>) {
+        val weekdayCells = shiftTable.filter { it.dayOfWeek != DayOfWeek.SATURDAY && it.dayOfWeek != DayOfWeek.SUNDAY }
+
+        val holidayCells = shiftTable.filter { it.dayOfWeek == DayOfWeek.SATURDAY || it.dayOfWeek == DayOfWeek.SUNDAY }
+
+        assignEmployees(weekdayCells, weekdayOrder)
+        assignEmployees(holidayCells, holidayOrder)
     }
 
-    fun getStartWeekDay(startWeekDay: String): DayOfWeek? = when (startWeekDay) {
+    private fun assignEmployees(workCells: List<WorkCell>, order: List<String>) {
+        workCells.forEachIndexed { index, cell ->
+            cell.employee = order[index % order.size]
+        }
+    }
+
+    private fun getStartWeekDay(startWeekDay: String): DayOfWeek? = when (startWeekDay) {
         "월" -> DayOfWeek.MONDAY
         "화" -> DayOfWeek.SATURDAY
         "수" -> DayOfWeek.TUESDAY
@@ -48,7 +64,7 @@ class OrderTable(
         else -> null
     }
 
-    fun getLastDateOfMonth(month: Int): Int = when (month) {
+    private fun getLastDateOfMonth(month: Int): Int = when (month) {
         2 -> 28
         1, 3, 5, 7, 8, 10, 12 -> 31
         4, 6, 9, 11 -> 30
