@@ -7,6 +7,7 @@ class GetInput(private val inputView: InputView) {
         while (true){
             try {
                 inputView.getMonthAndStartDayOfTheWeek()
+                inputView.getTurnNumber()
             } catch (e : Exception){
                 println(e.message)
             }
