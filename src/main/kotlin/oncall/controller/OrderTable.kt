@@ -39,9 +39,9 @@ class OrderTable(
     }
 
     private fun putOrder(shiftTable: MutableList<WorkCell>, weekdayOrder: List<String>, holidayOrder: List<String>) {
-        val weekdayCells = shiftTable.filter { it.dayOfWeek != DayOfWeek.SATURDAY && it.dayOfWeek != DayOfWeek.SUNDAY }
+        val weekdayCells = shiftTable.filter { it.dayOfWeek != DayOfWeek.SATURDAY && it.dayOfWeek != DayOfWeek.SUNDAY && !it.isHoliday}
 
-        val holidayCells = shiftTable.filter { it.dayOfWeek == DayOfWeek.SATURDAY || it.dayOfWeek == DayOfWeek.SUNDAY }
+        val holidayCells = shiftTable.filter { it.dayOfWeek == DayOfWeek.SATURDAY || it.dayOfWeek == DayOfWeek.SUNDAY || it.isHoliday }
 
         assignEmployees(weekdayCells, weekdayOrder)
         assignEmployees(holidayCells, holidayOrder)
