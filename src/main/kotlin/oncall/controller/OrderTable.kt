@@ -37,17 +37,17 @@ class OrderTable(
             val currentCell = shiftTable[index]
             val nextCell = shiftTable[index + 1]
             if (currentCell.employee == nextCell.employee) {
-                switchOrder(shiftTable, index + 1)
+                switchOrder(shiftTable, nextCell)
             }
         }
     }
 
-    private fun switchOrder(shiftTable: MutableList<WorkCell>, index: Int) {
-        for (i in shiftTable[index].date + 1 until shiftTable.size) {
-            if (shiftTable[index].isHolidayOrder() && shiftTable[i].isHolidayOrder()) {
-                val tmp = shiftTable[index]
-                shiftTable[index] = shiftTable[i]
-                shiftTable[i] = tmp
+    private fun switchOrder(shiftTable: MutableList<WorkCell>, cell: WorkCell) {
+        for (i in cell.date until shiftTable.size) {
+            if (cell.isHolidayOrder() && shiftTable[i].isHolidayOrder()) {
+                val tmp = cell.employee
+                cell.employee = shiftTable[i].employee
+                shiftTable[i].employee = tmp
                 return
             }
         }

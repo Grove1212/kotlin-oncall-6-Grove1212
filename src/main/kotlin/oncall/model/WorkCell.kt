@@ -17,15 +17,21 @@ class WorkCell(
         return !isHolidayOrder()
     }
 
-    private fun getDay(): String = when (dayOfWeek) {
-        DayOfWeek.MONDAY -> "월"
-        DayOfWeek.TUESDAY -> "화"
-        DayOfWeek.WEDNESDAY -> "수"
-        DayOfWeek.THURSDAY -> "목"
-        DayOfWeek.FRIDAY -> "금"
-        DayOfWeek.SATURDAY -> "토"
-        DayOfWeek.SUNDAY -> "일"
-        else -> ""
+    private fun getDay(): String {
+        var result = when (dayOfWeek) {
+            DayOfWeek.MONDAY -> "월"
+            DayOfWeek.TUESDAY -> "화"
+            DayOfWeek.WEDNESDAY -> "수"
+            DayOfWeek.THURSDAY -> "목"
+            DayOfWeek.FRIDAY -> "금"
+            DayOfWeek.SATURDAY -> "토"
+            DayOfWeek.SUNDAY -> "일"
+            else -> ""
+        }
+        if(isHoliday && (dayOfWeek != DayOfWeek.SUNDAY || dayOfWeek != DayOfWeek.SATURDAY)){
+            result += "(휴일)"
+        }
+        return result
     }
 
     @Override
