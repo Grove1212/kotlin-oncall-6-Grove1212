@@ -9,21 +9,53 @@ class OrderTable(
     private val outputView: OutputView,
     private val inputController: InputController
 ) {
-    fun run() {
-        val (month, startWeekDay) = inputController.controlGetMonthAndStartDayOfWeek()
-        val weekdayOrder = inputController.controlGetWeekdayOrder()
-        val holidayOrder = inputController.controlGetHolidayOrder()
-        val holidays = inputController.controlGetHolidays()
+    private val month: Int
+    private val startWeekDay: String
+    private val weekdayOrder: List<String>
+    private val holidayOrder: List<String>
+    private val holidays: List<CalendarCell>
 
-        val shiftTable = makeShiftTable(month, startWeekDay)
-        putHoliday(shiftTable, holidays)
-        putOrder(shiftTable, weekdayOrder, holidayOrder)
+    init {
+        val (m, startDay) = inputController.controlGetMonthAndStartDayOfWeek()
+        month = m
+        startWeekDay = startDay
+        weekdayOrder = inputController.controlGetWeekdayOrder()
+        holidayOrder = inputController.controlGetHolidayOrder()
+        holidays = inputController.controlGetHolidays()
     }
 
-    private fun makeShiftTable(month: Int, startWeekDayOfString: String): MutableList<WorkCell> {
+    fun run() {
+        val shiftTable = makeShiftTable()
+        putHoliday(shiftTable)
+        putOrder(shiftTable)
+        updateOrderIfWorkTwoDays(shiftTable)
+    }
+
+    private fun updateOrderIfWorkTwoDays(shiftTable: MutableList<WorkCell>) {
+        for (index in 0 until shiftTable.size - 2) {
+            val currentCell = shiftTable[index]
+            val nextCell = shiftTable[index + 1]
+            if (currentCell.employee == nextCell.employee) {
+                switchOrder(shiftTable, index + 1)
+            }
+        }
+    }
+
+    private fun switchOrder(shiftTable: MutableList<WorkCell>, index: Int) {
+        for (i in shiftTable[index].date + 1 until shiftTable.size) {
+            if (shiftTable[index].isHolidayOrder() && shiftTable[i].isHolidayOrder()) {
+                val tmp = shiftTable[index]
+                shiftTable[index] = shiftTable[i]
+                shiftTable[i] = tmp
+                return
+            }
+        }
+    }
+
+    private fun makeShiftTable(): MutableList<WorkCell> {
         val shiftTable = mutableListOf<WorkCell>()
         val lastDateOfMonth = getLastDateOfMonth(month)
-        val weekDay = getStartWeekDay(startWeekDayOfString)
+        val weekDay = getStartWeekDay(startWeekDay)
 
         for (i in 1..lastDateOfMonth) {
             shiftTable.add(WorkCell(month, i, weekDay?.plus(1)))
@@ -31,17 +63,16 @@ class OrderTable(
         return shiftTable
     }
 
-    private fun putHoliday(shiftTable: MutableList<WorkCell>, holidays: List<CalendarCell>) {
+    private fun putHoliday(shiftTable: MutableList<WorkCell>) {
         holidays.filter { shiftTable[0].month == it.month }
             .forEach { holiday ->
                 shiftTable.find { it.date == holiday.date }?.isHoliday = true
             }
     }
 
-    private fun putOrder(shiftTable: MutableList<WorkCell>, weekdayOrder: List<String>, holidayOrder: List<String>) {
-        val weekdayCells = shiftTable.filter { it.dayOfWeek != DayOfWeek.SATURDAY && it.dayOfWeek != DayOfWeek.SUNDAY && !it.isHoliday}
-
-        val holidayCells = shiftTable.filter { it.dayOfWeek == DayOfWeek.SATURDAY || it.dayOfWeek == DayOfWeek.SUNDAY || it.isHoliday }
+    private fun putOrder(shiftTable: MutableList<WorkCell>) {
+        val weekdayCells = shiftTable.filter { it.isWeekdayOrder() }
+        val holidayCells = shiftTable.filter { it.isHolidayOrder() }
 
         assignEmployees(weekdayCells, weekdayOrder)
         assignEmployees(holidayCells, holidayOrder)
