@@ -17,7 +17,7 @@ class InputView {
     }
 
     fun getMonthAndStartDayOfTheWeek(): Pair<Int, String> {
-        //println(MONTHANDSTARTDAYOFWEEK)
+        println(MONTHANDSTARTDAYOFWEEK)
         val input = Console.readLine().split(",") ?: throw IllegalArgumentException("[ERROR] 입력을 받을 수 없습니다.")
         val month = input[0].toInt()
         require(month in 1..12) {
@@ -31,12 +31,12 @@ class InputView {
     }
 
     fun getWeekdayOrder(): List<String> {
-        //println(WEEKDAYTURNNUMBER)
+        println(WEEKDAYTURNNUMBER)
         return getOrder()
     }
 
     fun getHolidayOrder(): List<String> {
-        //println(HOLIDAYTURNNUMBER)
+        println(HOLIDAYTURNNUMBER)
         return getOrder()
     }
 
