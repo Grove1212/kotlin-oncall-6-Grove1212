@@ -17,17 +17,17 @@ class InputView {
         return Pair(month, dayOfWeek)
     }
 
-    fun getWeekdayTurnNumber(): List<String> {
+    fun getWeekdayOrder(): List<String> {
         println(WEEKDAYTURNNUMBER)
-        return getTurnNumber()
+        return getOrder()
     }
 
-    fun getHolidayTurnNumber(): List<String> {
+    fun getHolidayOrder(): List<String> {
         println(HOLIDAYTURNNUMBER)
-        return getTurnNumber()
+        return getOrder()
     }
 
-    private fun getTurnNumber(): List<String> {
+    private fun getOrder(): List<String> {
         val input = Console.readLine().split(",") ?: throw IllegalArgumentException("[ERROR] 입력을 받을 수 없습니다.")
         input.forEach { require(it.length <= 5) { "[ERROR] 닉네임 길이는 5자를 초과하지 않습니다. 다시 입력해 주세요." } }
         require(input.size in 5..35) { "[ERROR] 순번은 5명에서 35명 사이여야 합니다." }
